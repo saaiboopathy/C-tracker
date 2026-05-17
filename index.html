@@ -109,10 +109,15 @@
                 <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
                     <h2 class="text-2xl font-heading font-bold text-carnatic-red">Attendance & Fees</h2>
                     
-                    <div class="flex gap-2 w-full sm:w-auto">
-                        <input type="month" id="monthSelector" onchange="renderTracker()" class="border border-carnatic-gold/50 rounded-lg px-3 py-2 bg-white text-carnatic-text focus:outline-none focus:ring-2 focus:ring-carnatic-red w-full sm:w-auto">
+                    <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                        <!-- Easy Month Navigation -->
+                        <div class="flex items-center gap-1 w-full sm:w-auto">
+                            <button onclick="changeMonth(-1)" class="p-2 border border-carnatic-gold/50 rounded-lg bg-white text-carnatic-red hover:bg-orange-50 shadow-sm transition-colors"><i class="fa-solid fa-chevron-left"></i></button>
+                            <input type="month" id="monthSelector" onchange="renderTracker()" class="border border-carnatic-gold/50 rounded-lg px-3 py-2 bg-white text-carnatic-text focus:outline-none focus:ring-2 focus:ring-carnatic-red flex-grow text-center font-medium">
+                            <button onclick="changeMonth(1)" class="p-2 border border-carnatic-gold/50 rounded-lg bg-white text-carnatic-red hover:bg-orange-50 shadow-sm transition-colors"><i class="fa-solid fa-chevron-right"></i></button>
+                        </div>
                         
-                        <select id="studentSelector" onchange="renderTracker()" class="border border-carnatic-gold/50 rounded-lg px-3 py-2 bg-white text-carnatic-text focus:outline-none focus:ring-2 focus:ring-carnatic-red w-full sm:w-auto">
+                        <select id="studentSelector" onchange="renderTracker()" class="border border-carnatic-gold/50 rounded-lg px-3 py-2 bg-white text-carnatic-text focus:outline-none focus:ring-2 focus:ring-carnatic-red w-full sm:w-auto font-medium">
                             <option value="">Select Student...</option>
                         </select>
                     </div>
@@ -203,12 +208,10 @@
                 <input type="hidden" id="dayModalDate">
                 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Attendance Status</label>
-                    <div class="flex gap-2">
-                        <button id="btnStatusNone" onclick="setDayStatus('None')" class="flex-1 py-2 border rounded-md font-medium transition-colors border-gray-300 text-gray-600 bg-gray-50">None</button>
-                        <button id="btnStatusPresent" onclick="setDayStatus('Present')" class="flex-1 py-2 border rounded-md font-medium transition-colors border-green-500 text-green-700 bg-green-50">Present</button>
-                        <button id="btnStatusAbsent" onclick="setDayStatus('Absent')" class="flex-1 py-2 border rounded-md font-medium transition-colors border-red-500 text-red-700 bg-red-50">Absent</button>
-                    </div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Class Attendance</label>
+                    <button id="btnToggleAttendance" onclick="toggleAttendance()" class="w-full py-3 border-2 rounded-lg font-bold transition-colors border-gray-300 text-gray-500 bg-gray-50 hover:bg-gray-100 flex items-center justify-center gap-2">
+                        <i class="fa-regular fa-circle text-xl"></i> Mark as Present
+                    </button>
                 </div>
 
                 <div>
@@ -489,6 +492,17 @@
         };
 
         // --- Tracker Logic ---
+        window.changeMonth = function(offset) {
+            const selector = document.getElementById('monthSelector');
+            if (!selector.value) return;
+            const [year, month] = selector.value.split('-').map(Number);
+            const newDate = new Date(year, month - 1 + offset, 1);
+            const newYear = newDate.getFullYear();
+            const newMonth = String(newDate.getMonth() + 1).padStart(2, '0');
+            selector.value = `${newYear}-${newMonth}`;
+            renderTracker();
+        };
+
         window.renderTracker = function() {
             const monthVal = document.getElementById('monthSelector').value;
             const studentId = document.getElementById('studentSelector').value;
@@ -531,13 +545,14 @@
                 if (status === 'Present') presentCount++;
 
                 let bgClass = "bg-gray-50 border-gray-200 text-gray-500 hover:bg-gray-100";
-                if (status === 'Present') bgClass = "bg-green-50 border-green-300 text-green-700 shadow-sm";
-                if (status === 'Absent') bgClass = "bg-red-50 border-red-300 text-red-700 shadow-sm";
+                if (status === 'Present') bgClass = "bg-green-50 border-green-300 text-green-800 shadow-sm";
 
                 grid.innerHTML += `
                     <div onclick="openDayModal('${dateStr}')" class="border rounded-lg p-3 cursor-pointer transition-all ${bgClass} flex flex-col items-center justify-center min-h-[80px] relative group">
                         <span class="font-bold text-lg">${i}</span>
-                        <span class="text-xs uppercase tracking-wider font-medium mt-1">${status !== 'None' ? status : ''}</span>
+                        <div class="mt-1 h-6 flex items-center justify-center">
+                            ${status === 'Present' ? '<i class="fa-solid fa-circle-check text-green-600 text-xl bg-white rounded-full"></i>' : ''}
+                        </div>
                         ${hasNotes ? `<i class="fa-solid fa-note-sticky absolute top-2 right-2 text-carnatic-gold text-sm drop-shadow-sm"></i>` : ''}
                         <div class="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 rounded-lg transition-opacity"></div>
                     </div>
@@ -563,7 +578,8 @@
             document.getElementById('dayModalTitle').innerText = formattedDate;
             document.getElementById('dayNotes').value = record.notes || '';
             
-            setDayStatus(record.status || 'None');
+            currentDayStatus = record.status === 'Present' ? 'Present' : 'None';
+            updateAttendanceButtonUI();
 
             document.getElementById('dayModal').classList.remove('hidden');
             document.getElementById('dayModal').classList.add('flex');
@@ -574,20 +590,24 @@
             document.getElementById('dayModal').classList.remove('flex');
         };
 
-        window.setDayStatus = function(status) {
-            currentDayStatus = status;
-            const btnNone = document.getElementById('btnStatusNone');
-            const btnPres = document.getElementById('btnStatusPresent');
-            const btnAbs = document.getElementById('btnStatusAbsent');
-            
-            // Reset all
-            btnNone.className = "flex-1 py-2 border rounded-md font-medium transition-colors border-gray-300 text-gray-600 bg-white hover:bg-gray-50";
-            btnPres.className = "flex-1 py-2 border rounded-md font-medium transition-colors border-gray-300 text-gray-600 bg-white hover:bg-green-50";
-            btnAbs.className =  "flex-1 py-2 border rounded-md font-medium transition-colors border-gray-300 text-gray-600 bg-white hover:bg-red-50";
+        window.toggleAttendance = function() {
+            if (currentDayStatus === 'Present') {
+                currentDayStatus = 'None';
+            } else {
+                currentDayStatus = 'Present';
+            }
+            updateAttendanceButtonUI();
+        };
 
-            if (status === 'None') btnNone.className = "flex-1 py-2 border rounded-md font-medium transition-colors border-gray-500 text-gray-800 bg-gray-200 shadow-inner";
-            if (status === 'Present') btnPres.className = "flex-1 py-2 border rounded-md font-medium transition-colors border-green-500 text-green-800 bg-green-200 shadow-inner";
-            if (status === 'Absent') btnAbs.className = "flex-1 py-2 border rounded-md font-medium transition-colors border-red-500 text-red-800 bg-red-200 shadow-inner";
+        window.updateAttendanceButtonUI = function() {
+            const btn = document.getElementById('btnToggleAttendance');
+            if (currentDayStatus === 'Present') {
+                btn.className = "w-full py-3 border-2 rounded-lg font-bold transition-colors border-green-500 text-green-700 bg-green-50 flex items-center justify-center gap-2";
+                btn.innerHTML = `<i class="fa-solid fa-circle-check text-xl"></i> Class Attended (Present)`;
+            } else {
+                btn.className = "w-full py-3 border-2 rounded-lg font-bold transition-colors border-gray-300 text-gray-500 bg-gray-50 hover:bg-gray-100 flex items-center justify-center gap-2";
+                btn.innerHTML = `<i class="fa-regular fa-circle text-xl"></i> Mark as Present`;
+            }
         };
 
         window.saveDayDetails = async function() {
