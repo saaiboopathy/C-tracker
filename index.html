@@ -89,8 +89,12 @@
         
         <!-- Sidebar Navigation (Tabs) -->
         <aside class="w-full md:w-64 flex-shrink-0 flex md:flex-col gap-2 overflow-x-auto hide-scrollbar">
-            <button onclick="switchTab('students')" id="tab-students" class="flex-1 md:flex-none flex items-center p-3 rounded-lg bg-carnatic-red text-white transition-all shadow-md border border-carnatic-red">
-                <i class="fa-solid fa-users w-6 text-center text-carnatic-gold"></i>
+            <button onclick="switchTab('dashboard')" id="tab-dashboard" class="flex-1 md:flex-none flex items-center p-3 rounded-lg bg-carnatic-red text-white transition-all shadow-md border border-carnatic-red">
+                <i class="fa-solid fa-chart-line w-6 text-center text-carnatic-gold"></i>
+                <span class="ml-2 font-medium">Dashboard</span>
+            </button>
+            <button onclick="switchTab('students')" id="tab-students" class="flex-1 md:flex-none flex items-center p-3 rounded-lg bg-white text-carnatic-text hover:bg-orange-50 transition-all shadow-sm border border-gray-200">
+                <i class="fa-solid fa-users w-6 text-center text-carnatic-red"></i>
                 <span class="ml-2 font-medium">My Students</span>
             </button>
             <button onclick="switchTab('tracker')" id="tab-tracker" class="flex-1 md:flex-none flex items-center p-3 rounded-lg bg-white text-carnatic-text hover:bg-orange-50 transition-all shadow-sm border border-gray-200">
@@ -106,6 +110,71 @@
             <div id="loadingState" class="flex flex-col items-center justify-center h-full text-carnatic-red">
                 <i class="fa-solid fa-circle-notch fa-spin text-4xl mb-4"></i>
                 <p class="font-heading text-lg animate-pulse">Loading Your Data...</p>
+            </div>
+
+            <!-- DASHBOARD VIEW -->
+            <div id="view-dashboard" class="hidden h-full flex flex-col">
+                <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
+                    <h2 class="text-2xl font-heading font-bold text-carnatic-red">Class Overview</h2>
+                    <div class="flex items-center gap-1 w-full sm:w-auto">
+                        <button onclick="changeDashboardMonth(-1)" class="p-2 border border-carnatic-gold/50 rounded-lg bg-white text-carnatic-red hover:bg-orange-50 shadow-sm transition-colors"><i class="fa-solid fa-chevron-left"></i></button>
+                        <input type="month" id="dashboardMonthSelector" onchange="renderDashboard()" class="border border-carnatic-gold/50 rounded-lg px-3 py-2 bg-white text-carnatic-text focus:outline-none focus:ring-2 focus:ring-carnatic-red text-center font-medium">
+                        <button onclick="changeDashboardMonth(1)" class="p-2 border border-carnatic-gold/50 rounded-lg bg-white text-carnatic-red hover:bg-orange-50 shadow-sm transition-colors"><i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                </div>
+
+                <!-- KPI Metric Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+                    <div class="bg-carnatic-bg border border-carnatic-gold/30 rounded-xl p-5 shadow-sm flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-lg bg-carnatic-red/10 text-carnatic-red flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-user-graduate"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500 font-bold uppercase tracking-wider">Total Active Students</p>
+                            <p id="dashTotalStudents" class="text-2xl font-heading font-bold text-carnatic-red">0</p>
+                        </div>
+                    </div>
+                    <div class="bg-carnatic-bg border border-carnatic-gold/30 rounded-xl p-5 shadow-sm flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-lg bg-orange-100 text-orange-800 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-person-chalkboard"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500 font-bold uppercase tracking-wider">Total Classes Conducted</p>
+                            <p id="dashTotalClasses" class="text-2xl font-heading font-bold text-carnatic-red">0</p>
+                        </div>
+                    </div>
+                    <div class="bg-green-50 border border-green-200 rounded-xl p-5 shadow-sm flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-lg bg-green-100 text-green-800 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-indian-rupee-sign"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500 font-bold uppercase tracking-wider">Estimated Monthly Revenue</p>
+                            <p id="dashTotalRevenue" class="text-2xl font-heading font-bold text-green-700">₹0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Monthly Breakdown Table -->
+                <div class="border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+                    <div class="bg-carnatic-bg py-3 px-5 border-b border-gray-200">
+                        <h3 class="font-heading font-bold text-lg text-carnatic-text">Monthly Student Breakdown</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Student Name</th>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Classes Attended</th>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Fee Per Class</th>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Total Fee Due</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dashTableBody" class="bg-white divide-y divide-gray-200 text-sm">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
 
             <!-- STUDENTS VIEW -->
@@ -173,8 +242,15 @@
                         <div class="bg-carnatic-bg py-3 px-4 border-b border-gray-200 flex justify-between items-center">
                             <h3 class="font-heading font-bold text-lg text-carnatic-text" id="calendarMonthLabel">Month Year</h3>
                         </div>
-                        <div class="p-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 overflow-y-auto max-h-[400px]" id="calendarGrid">
-                            <!-- Days injected here -->
+                        <div class="p-4 flex flex-col flex-grow">
+                            <!-- Weekday Headers -->
+                            <div class="grid grid-cols-7 gap-1 sm:gap-2 text-center text-xs font-bold text-carnatic-red/80 uppercase pb-2 border-b border-gray-100 mb-2">
+                                <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+                            </div>
+                            <!-- Calendar Days -->
+                            <div class="grid grid-cols-7 gap-1 sm:gap-2 overflow-y-auto max-h-[400px]" id="calendarGrid">
+                                <!-- Days injected here -->
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -327,14 +403,16 @@
                         document.getElementById('mainNav').classList.remove('hidden');
                         document.getElementById('mainApp').classList.remove('hidden');
                         document.getElementById('loadingState').style.display = 'none';
-                        document.getElementById('view-students').classList.remove('hidden');
                         
-                        setupRealtimeListeners();
-                        
-                        // Set current month as default
+                        // Set current month as default for both month pickers
                         const today = new Date();
                         const mm = String(today.getMonth() + 1).padStart(2, '0');
-                        document.getElementById('monthSelector').value = `${today.getFullYear()}-${mm}`;
+                        const defaultMonth = `${today.getFullYear()}-${mm}`;
+                        document.getElementById('monthSelector').value = defaultMonth;
+                        document.getElementById('dashboardMonthSelector').value = defaultMonth;
+
+                        switchTab('dashboard'); // Start on Dashboard
+                        setupRealtimeListeners();
                     } else {
                         // No user signed in, show Auth Screen
                         currentUserId = null;
@@ -385,8 +463,8 @@
                 snapshot.forEach(doc => students.push({ id: doc.id, ...doc.data() }));
                 updateStudentSelect();
                 window.renderStudents();
+                window.renderDashboard();
             }, (error) => {
-                // Ignore permission denied errors if they just logged out
                 if (currentUserId) showToast("Error loading students: " + error.message, "error");
             });
 
@@ -398,6 +476,7 @@
                     trackingData[doc.id] = doc.data();
                 });
                 window.renderTracker();
+                window.renderDashboard();
             }, (error) => {
                 if (currentUserId) showToast("Error loading tracker: " + error.message, "error");
             });
@@ -405,23 +484,95 @@
 
         // --- UI State Management ---
         window.switchTab = function(tab) {
+            document.getElementById('view-dashboard').classList.add('hidden');
             document.getElementById('view-students').classList.add('hidden');
             document.getElementById('view-tracker').classList.add('hidden');
             
-            document.getElementById('tab-students').className = 'flex-1 md:flex-none flex items-center p-3 rounded-lg bg-white text-carnatic-text hover:bg-orange-50 transition-all shadow-sm border border-gray-200';
-            document.getElementById('tab-students').querySelector('i').classList.replace('text-carnatic-gold', 'text-carnatic-red');
-            document.getElementById('tab-tracker').className = 'flex-1 md:flex-none flex items-center p-3 rounded-lg bg-white text-carnatic-text hover:bg-orange-50 transition-all shadow-sm border border-gray-200';
-            document.getElementById('tab-tracker').querySelector('i').classList.replace('text-carnatic-gold', 'text-carnatic-red');
+            // Reset tabs styling
+            ['dashboard', 'students', 'tracker'].forEach(t => {
+                const tabBtn = document.getElementById(`tab-${t}`);
+                tabBtn.className = 'flex-1 md:flex-none flex items-center p-3 rounded-lg bg-white text-carnatic-text hover:bg-orange-50 transition-all shadow-sm border border-gray-200';
+                
+                // Set non-selected icon colors
+                const icon = tabBtn.querySelector('i');
+                if (t === 'dashboard') icon.className = 'fa-solid fa-chart-line w-6 text-center text-carnatic-red';
+                if (t === 'students') icon.className = 'fa-solid fa-users w-6 text-center text-carnatic-red';
+                if (t === 'tracker') icon.className = 'fa-solid fa-calendar-days w-6 text-center text-carnatic-red';
+            });
 
-            if (tab === 'students') {
-                document.getElementById('view-students').classList.remove('hidden');
-                document.getElementById('tab-students').className = 'flex-1 md:flex-none flex items-center p-3 rounded-lg bg-carnatic-red text-white transition-all shadow-md border border-carnatic-red';
-                document.getElementById('tab-students').querySelector('i').classList.replace('text-carnatic-red', 'text-carnatic-gold');
-            } else {
-                document.getElementById('view-tracker').classList.remove('hidden');
-                document.getElementById('tab-tracker').className = 'flex-1 md:flex-none flex items-center p-3 rounded-lg bg-carnatic-red text-white transition-all shadow-md border border-carnatic-red';
-                document.getElementById('tab-tracker').querySelector('i').classList.replace('text-carnatic-red', 'text-carnatic-gold');
+            // Apply selected styling
+            document.getElementById(`view-${tab}`).classList.remove('hidden');
+            const activeTab = document.getElementById(`tab-${tab}`);
+            activeTab.className = 'flex-1 md:flex-none flex items-center p-3 rounded-lg bg-carnatic-red text-white transition-all shadow-md border border-carnatic-red';
+            
+            const activeIcon = activeTab.querySelector('i');
+            if (tab === 'dashboard') {
+                activeIcon.className = 'fa-solid fa-chart-line w-6 text-center text-carnatic-gold';
+                window.renderDashboard();
             }
+            if (tab === 'students') activeIcon.className = 'fa-solid fa-users w-6 text-center text-carnatic-gold';
+            if (tab === 'tracker') {
+                activeIcon.className = 'fa-solid fa-calendar-days w-6 text-center text-carnatic-gold';
+                window.renderTracker();
+            }
+        };
+
+        // --- Dashboard Logic ---
+        window.changeDashboardMonth = function(offset) {
+            const selector = document.getElementById('dashboardMonthSelector');
+            if (!selector.value) return;
+            const [year, month] = selector.value.split('-').map(Number);
+            const newDate = new Date(year, month - 1 + offset, 1);
+            const newYear = newDate.getFullYear();
+            const newMonth = String(newDate.getMonth() + 1).padStart(2, '0');
+            selector.value = `${newYear}-${newMonth}`;
+            renderDashboard();
+        };
+
+        window.renderDashboard = function() {
+            const monthVal = document.getElementById('dashboardMonthSelector').value;
+            if (!monthVal) return;
+
+            // Metric Calculations
+            const monthObj = trackingData[monthVal] || {};
+            let totalConducted = 0;
+            let totalRevenue = 0;
+            
+            const tableBody = document.getElementById('dashTableBody');
+            tableBody.innerHTML = '';
+
+            students.forEach(student => {
+                const records = monthObj[student.id] || {};
+                let attendanceCount = 0;
+                
+                Object.values(records).forEach(record => {
+                    if (record.status === 'Present') attendanceCount++;
+                });
+
+                const rate = parseFloat(student.feePerClass || 0);
+                const outstandingFee = attendanceCount * rate;
+
+                totalConducted += attendanceCount;
+                totalRevenue += outstandingFee;
+
+                tableBody.innerHTML += `
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">${student.name}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-gray-500">${attendanceCount} classes</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-gray-500">₹${rate}</td>
+                        <td class="px-6 py-4 whitespace-nowrap font-bold text-green-700">₹${outstandingFee}</td>
+                    </tr>
+                `;
+            });
+
+            if (students.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="4" class="px-6 py-8 text-center text-gray-500 italic">No student profiles created yet. Add them in "My Students".</td></tr>`;
+            }
+
+            // Update KPI cards
+            document.getElementById('dashTotalStudents').innerText = students.length;
+            document.getElementById('dashTotalClasses').innerText = totalConducted;
+            document.getElementById('dashTotalRevenue').innerText = `₹${totalRevenue}`;
         };
 
         // --- Students Logic ---
@@ -571,18 +722,24 @@
             const dateObj = new Date(year, month - 1, 1);
             const monthName = dateObj.toLocaleString('default', { month: 'long', year: 'numeric' });
             const daysInMonth = new Date(year, month, 0).getDate();
+            const firstDayIndex = dateObj.getDay(); // 0 (Sun) to 6 (Sat)
             
             document.getElementById('calendarMonthLabel').innerText = monthName;
             
             const studentData = students.find(s => s.id === studentId);
             const feePerClass = parseFloat(studentData?.feePerClass || 0);
-            
             const monthData = trackingData[monthVal]?.[studentId] || {};
             
             let presentCount = 0;
             const grid = document.getElementById('calendarGrid');
             grid.innerHTML = '';
 
+            // 1. Add Offset Blank Tiles to align weekdays correctly
+            for (let offset = 0; offset < firstDayIndex; offset++) {
+                grid.innerHTML += `<div class="bg-gray-100/30 rounded-lg min-h-[50px] sm:min-h-[80px] border border-gray-100 border-dashed"></div>`;
+            }
+
+            // 2. Render Calendar Days
             for (let i = 1; i <= daysInMonth; i++) {
                 const dateStr = `${monthVal}-${String(i).padStart(2, '0')}`;
                 const dayRecord = monthData[dateStr] || {};
@@ -595,12 +752,12 @@
                 if (status === 'Present') bgClass = "bg-green-50 border-green-300 text-green-800 shadow-sm";
 
                 grid.innerHTML += `
-                    <div onclick="openDayModal('${dateStr}')" class="border rounded-lg p-3 cursor-pointer transition-all ${bgClass} flex flex-col items-center justify-center min-h-[80px] relative group">
-                        <span class="font-bold text-lg">${i}</span>
-                        <div class="mt-1 h-6 flex items-center justify-center">
-                            ${status === 'Present' ? '<i class="fa-solid fa-circle-check text-green-600 text-xl bg-white rounded-full"></i>' : ''}
+                    <div onclick="openDayModal('${dateStr}')" class="border rounded-lg p-2 cursor-pointer transition-all ${bgClass} flex flex-col items-center justify-between min-h-[55px] sm:min-h-[80px] relative group">
+                        <span class="font-bold text-xs sm:text-base self-start sm:self-auto">${i}</span>
+                        <div class="h-6 flex items-center justify-center">
+                            ${status === 'Present' ? '<i class="fa-solid fa-circle-check text-green-600 text-lg sm:text-xl bg-white rounded-full"></i>' : ''}
                         </div>
-                        ${hasNotes ? `<i class="fa-solid fa-note-sticky absolute top-2 right-2 text-carnatic-gold text-sm drop-shadow-sm"></i>` : ''}
+                        ${hasNotes ? `<i class="fa-solid fa-note-sticky absolute top-1 right-1 text-carnatic-gold text-[10px] sm:text-xs drop-shadow-sm"></i>` : ''}
                         <div class="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 rounded-lg transition-opacity"></div>
                     </div>
                 `;
