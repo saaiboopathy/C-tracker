@@ -382,7 +382,8 @@
             ? JSON.parse(__firebase_config) 
             : myCustomFirebaseConfig;
         
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'carnatic-tracker-default';
+        // ✅ NEW
+        const appId = 'default-app';;
 
         let app, auth, db, currentUserId;
         let students = [];
