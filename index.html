@@ -55,7 +55,7 @@
                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                     <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
                     <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                 </svg>
                 Sign in with Google
             </button>
@@ -165,8 +165,9 @@
                                 <tr>
                                     <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Student Name</th>
                                     <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Classes Attended</th>
-                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Fee Per Class</th>
-                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Total Fee Due</th>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Current Rate</th>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Total Fees</th>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Payment Status</th>
                                 </tr>
                             </thead>
                             <tbody id="dashTableBody" class="bg-white divide-y divide-gray-200 text-sm">
@@ -198,6 +199,13 @@
 
             <!-- TRACKER VIEW -->
             <div id="view-tracker" class="hidden h-full flex flex-col">
+                <!-- Task 1: Quick-Select Student Pills Bar -->
+                <div class="mb-4 pb-2 border-b border-gray-200">
+                    <div class="flex items-center gap-2 overflow-x-auto hide-scrollbar py-1" id="studentQuickBar">
+                        <!-- Quick Select Pills injected here -->
+                    </div>
+                </div>
+
                 <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
                     <h2 class="text-2xl font-heading font-bold text-carnatic-red">Attendance & Fees</h2>
                     
@@ -209,7 +217,7 @@
                             <button onclick="changeMonth(1)" class="p-2 border border-carnatic-gold/50 rounded-lg bg-white text-carnatic-red hover:bg-orange-50 shadow-sm transition-colors"><i class="fa-solid fa-chevron-right"></i></button>
                         </div>
                         
-                        <select id="studentSelector" onchange="renderTracker()" class="border border-carnatic-gold/50 rounded-lg px-3 py-2 bg-white text-carnatic-text focus:outline-none focus:ring-2 focus:ring-carnatic-red w-full sm:w-auto font-medium">
+                        <select id="studentSelector" onchange="selectStudentFromDropdown(this.value)" class="border border-carnatic-gold/50 rounded-lg px-3 py-2 bg-white text-carnatic-text focus:outline-none focus:ring-2 focus:ring-carnatic-red w-full sm:w-auto font-medium">
                             <option value="">Select Student...</option>
                         </select>
                     </div>
@@ -222,18 +230,28 @@
 
                 <div id="trackerContent" class="hidden flex-col h-full">
                     <!-- Summary Cards -->
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
                         <div class="bg-carnatic-bg border border-carnatic-gold/30 rounded-lg p-4 text-center">
                             <p class="text-sm text-gray-500 font-medium">Classes Attended</p>
                             <p id="statClasses" class="text-3xl font-heading font-bold text-carnatic-red mt-1">0</p>
                         </div>
                         <div class="bg-carnatic-bg border border-carnatic-gold/30 rounded-lg p-4 text-center">
-                            <p class="text-sm text-gray-500 font-medium">Fee Per Class</p>
+                            <p class="text-sm text-gray-500 font-medium">Default Rate</p>
                             <p id="statFeePerClass" class="text-3xl font-heading font-bold text-carnatic-red mt-1">₹0</p>
                         </div>
-                        <div class="bg-orange-100 border border-carnatic-gold/50 rounded-lg p-4 text-center shadow-sm">
-                            <p class="text-sm text-carnatic-red font-medium">Total Fees Due</p>
+                        <div class="bg-orange-50 border border-carnatic-gold/50 rounded-lg p-4 text-center shadow-sm">
+                            <p class="text-sm text-carnatic-red font-medium">Total Calculated Fees</p>
                             <p id="statTotalFees" class="text-3xl font-heading font-bold text-green-700 mt-1">₹0</p>
+                        </div>
+                        <!-- Task 2: Payment Tracking Card -->
+                        <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-4 text-center shadow-sm flex flex-col justify-between">
+                            <div>
+                                <p class="text-sm text-emerald-800 font-medium">Paid / Balance</p>
+                                <p id="statPaymentStatus" class="text-lg font-heading font-bold text-emerald-700 mt-1">₹0 Paid</p>
+                            </div>
+                            <button onclick="openPaymentModal()" class="mt-2 text-xs bg-emerald-600 text-white font-bold py-1 px-3 rounded hover:bg-emerald-700 transition-colors shadow">
+                                <i class="fa-solid fa-receipt mr-1"></i> Log Payment
+                            </button>
                         </div>
                     </div>
 
@@ -313,6 +331,12 @@
                     </button>
                 </div>
 
+                <!-- Task 2: Specific Fee for this specific date -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Class Rate / Fee (₹)</label>
+                    <input type="number" id="dayClassFee" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-carnatic-red outline-none" placeholder="Default rate used if empty">
+                </div>
+
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Notes (Ragas, Exercises, Feedback)</label>
                     <textarea id="dayNotes" rows="3" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-carnatic-red outline-none resize-none" placeholder="E.g., Taught Sarali Varisai..."></textarea>
@@ -320,6 +344,34 @@
             </div>
             <div class="bg-gray-50 px-5 py-3 flex justify-end gap-3 border-t">
                 <button onclick="saveDayDetails()" class="w-full py-2 bg-carnatic-gold text-carnatic-red font-bold rounded-md hover:bg-yellow-500 transition-colors shadow">Save Details</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Task 2: Payment Modal -->
+    <div id="paymentModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50 p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden border border-carnatic-gold">
+            <div class="bg-carnatic-red text-carnatic-gold py-4 px-6 flex justify-between items-center">
+                <h3 class="font-heading font-bold text-xl"><i class="fa-solid fa-indian-rupee-sign mr-2"></i> Log Payment / Advance</h3>
+                <button onclick="closePaymentModal()" class="text-white hover:text-carnatic-gold transition-colors"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Amount Paid (₹)</label>
+                    <input type="number" id="payAmount" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-carnatic-red outline-none" placeholder="e.g. 2000">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Payment Date</label>
+                    <input type="date" id="payDate" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-carnatic-red outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Notes / Mode (UPI, GPay, Cash, Early Payment)</label>
+                    <input type="text" id="payNotes" placeholder="e.g., Paid via GPay advance for July" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-carnatic-red outline-none">
+                </div>
+            </div>
+            <div class="bg-gray-50 px-6 py-4 flex justify-end gap-3 border-t">
+                <button onclick="closePaymentModal()" class="px-4 py-2 text-gray-600 font-medium hover:bg-gray-100 rounded-md transition-colors">Cancel</button>
+                <button onclick="savePayment()" class="px-4 py-2 bg-emerald-600 text-white font-medium rounded-md hover:bg-emerald-700 transition-colors shadow">Record Payment</button>
             </div>
         </div>
     </div>
@@ -362,9 +414,6 @@
         import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // =========================================================================
-        // ⬇️⬇️⬇️ PASTE YOUR FIREBASE CONFIGURATION BELOW ⬇️⬇️⬇️
-        // =========================================================================
         const myCustomFirebaseConfig = {
             apiKey: "AIzaSyD5KfGxnc6LwAkZXifWSosjQnZ3olK5Zsw",
             authDomain: "c-tracker-34282.firebaseapp.com",
@@ -374,15 +423,11 @@
             appId: "1:102601333204:web:db4822df146a94011b5e41",
             measurementId: "G-5HN6J9HYHE"
         };
-        // =========================================================================
-        // ⬆️⬆️⬆️ PASTE YOUR FIREBASE CONFIGURATION ABOVE ⬆️⬆️⬆️
-        // =========================================================================
 
         const firebaseConfig = typeof __firebase_config !== 'undefined' 
             ? JSON.parse(__firebase_config) 
             : myCustomFirebaseConfig;
         
-        // ✅ NEW
         const appId = 'carnatic-tracker-default';
 
         let app, auth, db, currentUserId;
@@ -398,24 +443,21 @@
 
                 onAuthStateChanged(auth, (user) => {
                     if (user) {
-                        // User is signed in
                         currentUserId = user.uid;
                         document.getElementById('authScreen').classList.add('hidden');
                         document.getElementById('mainNav').classList.remove('hidden');
                         document.getElementById('mainApp').classList.remove('hidden');
                         document.getElementById('loadingState').style.display = 'none';
                         
-                        // Set current month as default for both month pickers
                         const today = new Date();
                         const mm = String(today.getMonth() + 1).padStart(2, '0');
                         const defaultMonth = `${today.getFullYear()}-${mm}`;
                         document.getElementById('monthSelector').value = defaultMonth;
                         document.getElementById('dashboardMonthSelector').value = defaultMonth;
 
-                        switchTab('dashboard'); // Start on Dashboard
+                        switchTab('dashboard');
                         setupRealtimeListeners();
                     } else {
-                        // No user signed in, show Auth Screen
                         currentUserId = null;
                         document.getElementById('authScreen').classList.remove('hidden');
                         document.getElementById('mainNav').classList.add('hidden');
@@ -433,7 +475,6 @@
             }
         }
 
-        // Authentication Methods
         window.signInWithGoogle = async function() {
             const provider = new GoogleAuthProvider();
             try {
@@ -457,7 +498,6 @@
         function setupRealtimeListeners() {
             if (!currentUserId) return;
 
-            // Listen to Students
             const studentsRef = collection(db, 'artifacts', appId, 'users', currentUserId, 'students');
             onSnapshot(studentsRef, (snapshot) => {
                 students = [];
@@ -469,7 +509,6 @@
                 if (currentUserId) showToast("Error loading students: " + error.message, "error");
             });
 
-            // Listen to Tracking Data
             const trackingRef = collection(db, 'artifacts', appId, 'users', currentUserId, 'tracking');
             onSnapshot(trackingRef, (snapshot) => {
                 trackingData = {};
@@ -483,25 +522,21 @@
             });
         }
 
-        // --- UI State Management ---
         window.switchTab = function(tab) {
             document.getElementById('view-dashboard').classList.add('hidden');
             document.getElementById('view-students').classList.add('hidden');
             document.getElementById('view-tracker').classList.add('hidden');
             
-            // Reset tabs styling
             ['dashboard', 'students', 'tracker'].forEach(t => {
                 const tabBtn = document.getElementById(`tab-${t}`);
                 tabBtn.className = 'flex-1 md:flex-none flex items-center p-3 rounded-lg bg-white text-carnatic-text hover:bg-orange-50 transition-all shadow-sm border border-gray-200';
                 
-                // Set non-selected icon colors
                 const icon = tabBtn.querySelector('i');
                 if (t === 'dashboard') icon.className = 'fa-solid fa-chart-line w-6 text-center text-carnatic-red';
                 if (t === 'students') icon.className = 'fa-solid fa-users w-6 text-center text-carnatic-red';
                 if (t === 'tracker') icon.className = 'fa-solid fa-calendar-days w-6 text-center text-carnatic-red';
             });
 
-            // Apply selected styling
             document.getElementById(`view-${tab}`).classList.remove('hidden');
             const activeTab = document.getElementById(`tab-${tab}`);
             activeTab.className = 'flex-1 md:flex-none flex items-center p-3 rounded-lg bg-carnatic-red text-white transition-all shadow-md border border-carnatic-red';
@@ -534,7 +569,6 @@
             const monthVal = document.getElementById('dashboardMonthSelector').value;
             if (!monthVal) return;
 
-            // Metric Calculations
             const monthObj = trackingData[monthVal] || {};
             let totalConducted = 0;
             let totalRevenue = 0;
@@ -544,33 +578,49 @@
 
             students.forEach(student => {
                 const records = monthObj[student.id] || {};
+                const payments = monthObj[`${student.id}_payments`] || [];
                 let attendanceCount = 0;
+                let studentTotalDue = 0;
                 
-                Object.values(records).forEach(record => {
-                    if (record.status === 'Present') attendanceCount++;
+                // Calculate historical attendance fee snapshots
+                Object.entries(records).forEach(([dateKey, record]) => {
+                    if (record.status === 'Present') {
+                        attendanceCount++;
+                        const rateForDay = record.feeSnapshot !== undefined && record.feeSnapshot !== "" 
+                            ? parseFloat(record.feeSnapshot) 
+                            : parseFloat(student.feePerClass || 0);
+                        studentTotalDue += rateForDay;
+                    }
                 });
 
-                const rate = parseFloat(student.feePerClass || 0);
-                const outstandingFee = attendanceCount * rate;
+                const totalPaid = payments.reduce((sum, p) => sum + parseFloat(p.amount || 0), 0);
+                const currentRate = parseFloat(student.feePerClass || 0);
 
                 totalConducted += attendanceCount;
-                totalRevenue += outstandingFee;
+                totalRevenue += studentTotalDue;
+
+                let paymentBadge = `<span class="px-2 py-1 rounded text-xs bg-red-100 text-red-700 font-bold">Unpaid</span>`;
+                if (totalPaid >= studentTotalDue && studentTotalDue > 0) {
+                    paymentBadge = `<span class="px-2 py-1 rounded text-xs bg-green-100 text-green-700 font-bold">Paid (₹${totalPaid})</span>`;
+                } else if (totalPaid > 0) {
+                    paymentBadge = `<span class="px-2 py-1 rounded text-xs bg-yellow-100 text-yellow-800 font-bold">Partial (₹${totalPaid}/₹${studentTotalDue})</span>`;
+                }
 
                 tableBody.innerHTML += `
                     <tr>
                         <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">${student.name}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-gray-500">${attendanceCount} classes</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-gray-500">₹${rate}</td>
-                        <td class="px-6 py-4 whitespace-nowrap font-bold text-green-700">₹${outstandingFee}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-gray-500">₹${currentRate}</td>
+                        <td class="px-6 py-4 whitespace-nowrap font-bold text-green-700">₹${studentTotalDue}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">${paymentBadge}</td>
                     </tr>
                 `;
             });
 
             if (students.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="4" class="px-6 py-8 text-center text-gray-500 italic">No student profiles created yet. Add them in "My Students".</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-gray-500 italic">No student profiles created yet. Add them in "My Students".</td></tr>`;
             }
 
-            // Update KPI cards
             document.getElementById('dashTotalStudents').innerText = students.length;
             document.getElementById('dashTotalClasses').innerText = totalConducted;
             document.getElementById('dashTotalRevenue').innerText = `₹${totalRevenue}`;
@@ -581,11 +631,52 @@
             const select = document.getElementById('studentSelector');
             const currentVal = select.value;
             select.innerHTML = '<option value="">Select Student...</option>';
-            students.sort((a, b) => a.name.localeCompare(b.name)).forEach(s => {
+            
+            const sortedStudents = [...students].sort((a, b) => a.name.localeCompare(b.name));
+            sortedStudents.forEach(s => {
                 select.innerHTML += `<option value="${s.id}">${s.name}</option>`;
             });
             if (students.find(s => s.id === currentVal)) select.value = currentVal;
+
+            // Render Task 1 Quick-Select Bar
+            renderStudentQuickBar();
         }
+
+        // Task 1: Quick Bar Rendering
+        function renderStudentQuickBar() {
+            const bar = document.getElementById('studentQuickBar');
+            if (!bar) return;
+            const currentVal = document.getElementById('studentSelector').value;
+            const monthVal = document.getElementById('monthSelector').value;
+            const monthObj = trackingData[monthVal] || {};
+
+            bar.innerHTML = '';
+            
+            const sortedStudents = [...students].sort((a, b) => a.name.localeCompare(b.name));
+            sortedStudents.forEach(s => {
+                const isActive = s.id === currentVal;
+                const records = monthObj[s.id] || {};
+                let attended = 0;
+                Object.values(records).forEach(r => { if (r.status === 'Present') attended++; });
+
+                const activeClass = isActive 
+                    ? 'bg-carnatic-red text-white font-bold shadow-md' 
+                    : 'bg-white text-carnatic-text hover:bg-orange-100 border border-carnatic-gold/40';
+
+                bar.innerHTML += `
+                    <button onclick="selectStudentFromDropdown('${s.id}')" class="px-4 py-2 rounded-full text-xs sm:text-sm whitespace-nowrap transition-all flex items-center gap-2 ${activeClass}">
+                        <span>${s.name}</span>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] ${isActive ? 'bg-carnatic-gold text-carnatic-red' : 'bg-carnatic-bg text-carnatic-red font-bold'}">${attended} classes</span>
+                    </button>
+                `;
+            });
+        }
+
+        window.selectStudentFromDropdown = function(studentId) {
+            document.getElementById('studentSelector').value = studentId;
+            renderStudentQuickBar();
+            renderTracker();
+        };
 
         window.renderStudents = function() {
             const list = document.getElementById('studentsList');
@@ -699,6 +790,7 @@
             const newYear = newDate.getFullYear();
             const newMonth = String(newDate.getMonth() + 1).padStart(2, '0');
             selector.value = `${newYear}-${newMonth}`;
+            renderStudentQuickBar();
             renderTracker();
         };
 
@@ -723,38 +815,51 @@
             const dateObj = new Date(year, month - 1, 1);
             const monthName = dateObj.toLocaleString('default', { month: 'long', year: 'numeric' });
             const daysInMonth = new Date(year, month, 0).getDate();
-            const firstDayIndex = dateObj.getDay(); // 0 (Sun) to 6 (Sat)
+            const firstDayIndex = dateObj.getDay();
             
             document.getElementById('calendarMonthLabel').innerText = monthName;
             
             const studentData = students.find(s => s.id === studentId);
-            const feePerClass = parseFloat(studentData?.feePerClass || 0);
+            const defaultFee = parseFloat(studentData?.feePerClass || 0);
             const monthData = trackingData[monthVal]?.[studentId] || {};
+            const payments = trackingData[monthVal]?.[`${studentId}_payments`] || [];
             
             let presentCount = 0;
+            let totalMonthFee = 0;
             const grid = document.getElementById('calendarGrid');
             grid.innerHTML = '';
 
-            // 1. Add Offset Blank Tiles to align weekdays correctly
             for (let offset = 0; offset < firstDayIndex; offset++) {
                 grid.innerHTML += `<div class="bg-gray-100/30 rounded-lg min-h-[50px] sm:min-h-[80px] border border-gray-100 border-dashed"></div>`;
             }
 
-            // 2. Render Calendar Days
             for (let i = 1; i <= daysInMonth; i++) {
                 const dateStr = `${monthVal}-${String(i).padStart(2, '0')}`;
                 const dayRecord = monthData[dateStr] || {};
                 const status = dayRecord.status || 'None';
                 const hasNotes = !!dayRecord.notes;
                 
-                if (status === 'Present') presentCount++;
+                if (status === 'Present') {
+                    presentCount++;
+                    const rateForDay = dayRecord.feeSnapshot !== undefined && dayRecord.feeSnapshot !== "" 
+                        ? parseFloat(dayRecord.feeSnapshot) 
+                        : defaultFee;
+                    totalMonthFee += rateForDay;
+                }
 
                 let bgClass = "bg-gray-50 border-gray-200 text-gray-500 hover:bg-gray-100";
                 if (status === 'Present') bgClass = "bg-green-50 border-green-300 text-green-800 shadow-sm";
 
+                const dayDisplayFee = dayRecord.feeSnapshot !== undefined && dayRecord.feeSnapshot !== "" 
+                    ? `₹${dayRecord.feeSnapshot}` 
+                    : '';
+
                 grid.innerHTML += `
                     <div onclick="openDayModal('${dateStr}')" class="border rounded-lg p-2 cursor-pointer transition-all ${bgClass} flex flex-col items-center justify-between min-h-[55px] sm:min-h-[80px] relative group">
-                        <span class="font-bold text-xs sm:text-base self-start sm:self-auto">${i}</span>
+                        <div class="flex justify-between w-full text-[10px] sm:text-xs">
+                            <span class="font-bold text-xs sm:text-base">${i}</span>
+                            <span class="text-green-700 font-semibold">${status === 'Present' ? dayDisplayFee : ''}</span>
+                        </div>
                         <div class="h-6 flex items-center justify-center">
                             ${status === 'Present' ? '<i class="fa-solid fa-circle-check text-green-600 text-lg sm:text-xl bg-white rounded-full"></i>' : ''}
                         </div>
@@ -764,10 +869,13 @@
                 `;
             }
 
-            // Update Stats
+            const totalPaid = payments.reduce((sum, p) => sum + parseFloat(p.amount || 0), 0);
+            const balance = totalMonthFee - totalPaid;
+
             document.getElementById('statClasses').innerText = presentCount;
-            document.getElementById('statFeePerClass').innerText = `₹${feePerClass}`;
-            document.getElementById('statTotalFees').innerText = `₹${presentCount * feePerClass}`;
+            document.getElementById('statFeePerClass').innerText = `₹${defaultFee}`;
+            document.getElementById('statTotalFees').innerText = `₹${totalMonthFee}`;
+            document.getElementById('statPaymentStatus').innerText = `₹${totalPaid} Paid (${balance <= 0 ? 'Settled' : '₹' + balance + ' Due'})`;
         };
 
         // --- Day Modal Logic ---
@@ -777,11 +885,13 @@
             const studentId = document.getElementById('studentSelector').value;
             const monthVal = dateStr.substring(0, 7);
             const record = trackingData[monthVal]?.[studentId]?.[dateStr] || {};
+            const studentData = students.find(s => s.id === studentId);
             
             document.getElementById('dayModalDate').value = dateStr;
             const formattedDate = new Date(dateStr).toLocaleDateString('default', { weekday: 'short', month: 'short', day: 'numeric' });
             document.getElementById('dayModalTitle').innerText = formattedDate;
             document.getElementById('dayNotes').value = record.notes || '';
+            document.getElementById('dayClassFee').value = record.feeSnapshot !== undefined ? record.feeSnapshot : (studentData?.feePerClass || '');
             
             currentDayStatus = record.status === 'Present' ? 'Present' : 'None';
             updateAttendanceButtonUI();
@@ -796,11 +906,7 @@
         };
 
         window.toggleAttendance = function() {
-            if (currentDayStatus === 'Present') {
-                currentDayStatus = 'None';
-            } else {
-                currentDayStatus = 'Present';
-            }
+            currentDayStatus = currentDayStatus === 'Present' ? 'None' : 'Present';
             updateAttendanceButtonUI();
         };
 
@@ -819,6 +925,7 @@
             if (!currentUserId) return;
             const dateStr = document.getElementById('dayModalDate').value;
             const notes = document.getElementById('dayNotes').value.trim();
+            const classFee = document.getElementById('dayClassFee').value;
             const studentId = document.getElementById('studentSelector').value;
             const monthVal = dateStr.substring(0, 7);
 
@@ -828,7 +935,8 @@
             
             currentMonthData[studentId][dateStr] = {
                 status: currentDayStatus,
-                notes: notes
+                notes: notes,
+                feeSnapshot: classFee !== "" ? parseFloat(classFee) : ""
             };
 
             try {
@@ -837,6 +945,54 @@
                 showToast("Saved successfully!", "success");
             } catch (e) {
                 showToast("Error saving attendance: " + e.message, "error");
+            }
+        };
+
+        // Task 2: Payment Modal Functions
+        window.openPaymentModal = function() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('payDate').value = today;
+            document.getElementById('payAmount').value = '';
+            document.getElementById('payNotes').value = '';
+            document.getElementById('paymentModal').classList.remove('hidden');
+            document.getElementById('paymentModal').classList.add('flex');
+        };
+
+        window.closePaymentModal = function() {
+            document.getElementById('paymentModal').classList.add('hidden');
+            document.getElementById('paymentModal').classList.remove('flex');
+        };
+
+        window.savePayment = async function() {
+            if (!currentUserId) return;
+            const studentId = document.getElementById('studentSelector').value;
+            const monthVal = document.getElementById('monthSelector').value;
+            const amount = document.getElementById('payAmount').value;
+            const payDate = document.getElementById('payDate').value;
+            const notes = document.getElementById('payNotes').value.trim();
+
+            if (!amount || amount <= 0) {
+                showToast("Please enter a valid amount!", "error");
+                return;
+            }
+
+            const currentMonthData = trackingData[monthVal] ? JSON.parse(JSON.stringify(trackingData[monthVal])) : {};
+            const paymentKey = `${studentId}_payments`;
+            if (!currentMonthData[paymentKey]) currentMonthData[paymentKey] = [];
+
+            currentMonthData[paymentKey].push({
+                amount: parseFloat(amount),
+                date: payDate,
+                notes: notes,
+                timestamp: Date.now()
+            });
+
+            try {
+                await setDoc(doc(db, 'artifacts', appId, 'users', currentUserId, 'tracking', monthVal), currentMonthData);
+                closePaymentModal();
+                showToast("Payment recorded!", "success");
+            } catch (e) {
+                showToast("Error saving payment: " + e.message, "error");
             }
         };
 
