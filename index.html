@@ -22,12 +22,6 @@
                             500: '#f43f5e',
                             800: '#9f1239',
                             900: '#881337',
-                        },
-                        carnatic: {
-                            primary: '#800020',
-                            accent: '#d97706',
-                            bg: '#f8fafc',
-                            card: '#ffffff'
                         }
                     },
                     fontFamily: {
@@ -61,7 +55,7 @@
                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                     <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
                     <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                 </svg>
                 Sign in with Google
             </button>
@@ -95,35 +89,39 @@
         
         <!-- Sidebar Navigation -->
         <aside class="w-full md:w-56 flex-shrink-0 flex md:flex-col gap-1 overflow-x-auto hide-scrollbar">
-            <button onclick="switchTab('dashboard')" id="tab-dashboard" class="flex-1 md:flex-none flex items-center p-2.5 rounded-xl text-sm font-medium transition-all">
+            <button onclick="switchTab('dashboard')" id="tab-dashboard" class="flex-1 md:flex-none flex items-center p-2.5 rounded-xl text-xs font-semibold transition-all">
                 <i class="fa-solid fa-chart-pie w-5 text-center mr-2"></i>
-                Dashboard
+                Class Overview
             </button>
-            <button onclick="switchTab('students')" id="tab-students" class="flex-1 md:flex-none flex items-center p-2.5 rounded-xl text-sm font-medium transition-all">
+            <button onclick="switchTab('finances')" id="tab-finances" class="flex-1 md:flex-none flex items-center p-2.5 rounded-xl text-xs font-semibold transition-all">
+                <i class="fa-solid fa-wallet w-5 text-center mr-2"></i>
+                Financial Master
+            </button>
+            <button onclick="switchTab('students')" id="tab-students" class="flex-1 md:flex-none flex items-center p-2.5 rounded-xl text-xs font-semibold transition-all">
                 <i class="fa-solid fa-users w-5 text-center mr-2"></i>
                 Students
             </button>
-            <button onclick="switchTab('tracker')" id="tab-tracker" class="flex-1 md:flex-none flex items-center p-2.5 rounded-xl text-sm font-medium transition-all">
+            <button onclick="switchTab('tracker')" id="tab-tracker" class="flex-1 md:flex-none flex items-center p-2.5 rounded-xl text-xs font-semibold transition-all">
                 <i class="fa-solid fa-calendar-days w-5 text-center mr-2"></i>
                 Tracker & Billing
             </button>
         </aside>
 
-        <!-- Main Workspace Section -->
+        <!-- Workspace Area -->
         <section class="flex-grow bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 md:p-6 min-h-[520px]">
             
             <!-- Loading Spinner -->
             <div id="loadingState" class="flex flex-col items-center justify-center h-full text-slate-400 py-16">
                 <i class="fa-solid fa-circle-notch fa-spin text-3xl mb-3 text-rose-600"></i>
-                <p class="text-sm font-medium">Syncing your music classes...</p>
+                <p class="text-sm font-medium">Loading tracker data...</p>
             </div>
 
-            <!-- DASHBOARD VIEW -->
+            <!-- 1. CLASS OVERVIEW (MAIN DASHBOARD) -->
             <div id="view-dashboard" class="hidden space-y-6">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
-                        <h2 class="text-xl font-bold text-slate-900">Dashboard</h2>
-                        <p class="text-slate-500 text-xs">Summary of classes and revenue logs</p>
+                        <h2 class="text-xl font-bold text-slate-900">Class Overview</h2>
+                        <p class="text-slate-500 text-xs">Monthly class counts & student attendance logs</p>
                     </div>
                     <div class="flex items-center gap-1">
                         <button onclick="changeDashboardMonth(-1)" class="p-2 text-slate-600 border border-slate-200 hover:bg-slate-50 rounded-lg transition-colors"><i class="fa-solid fa-chevron-left text-xs"></i></button>
@@ -132,36 +130,30 @@
                     </div>
                 </div>
 
-                <!-- KPI Grid -->
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div class="bg-slate-50/80 border border-slate-200/60 rounded-xl p-4">
+                <!-- Class KPI Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-4">
                         <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Active Students</p>
                         <p id="dashTotalStudents" class="text-2xl font-bold text-slate-900">0</p>
                     </div>
-                    <div class="bg-slate-50/80 border border-slate-200/60 rounded-xl p-4">
-                        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Classes Conducted</p>
-                        <p id="dashTotalClasses" class="text-2xl font-bold text-rose-600">0</p>
-                    </div>
-                    <div class="bg-emerald-50/60 border border-emerald-200/60 rounded-xl p-4">
-                        <p class="text-xs font-semibold text-emerald-800 uppercase tracking-wider mb-1">Calculated Earnings</p>
-                        <p id="dashTotalRevenue" class="text-2xl font-bold text-emerald-700">₹0</p>
+                    <div class="bg-rose-50/50 border border-rose-200/60 rounded-xl p-4">
+                        <p class="text-xs font-semibold text-rose-800 uppercase tracking-wider mb-1">Classes Conducted This Month</p>
+                        <p id="dashTotalClasses" class="text-2xl font-bold text-rose-700">0</p>
                     </div>
                 </div>
 
-                <!-- Breakdown Table -->
+                <!-- Class Attendance Breakdown Table -->
                 <div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-                    <div class="bg-slate-50/80 px-4 py-3 border-b border-slate-200">
-                        <h3 class="font-semibold text-sm text-slate-800">Monthly Student Breakdown</h3>
+                    <div class="bg-slate-50 px-4 py-3 border-b border-slate-200">
+                        <h3 class="font-semibold text-xs text-slate-800 uppercase tracking-wider">Attendance Breakdown</h3>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse text-xs">
                             <thead>
-                                <tr class="bg-slate-50 text-slate-500 font-semibold uppercase tracking-wider border-b border-slate-200">
+                                <tr class="bg-slate-50/50 text-slate-400 font-semibold uppercase border-b border-slate-200">
                                     <th class="p-3">Student Name</th>
-                                    <th class="p-3">Classes</th>
-                                    <th class="p-3">Rate/Class</th>
-                                    <th class="p-3">Total Due</th>
-                                    <th class="p-3">Payment Status</th>
+                                    <th class="p-3">Classes Attended</th>
+                                    <th class="p-3">Base Fee / Class</th>
                                 </tr>
                             </thead>
                             <tbody id="dashTableBody" class="divide-y divide-slate-100 font-medium">
@@ -172,7 +164,61 @@
                 </div>
             </div>
 
-            <!-- STUDENTS VIEW -->
+            <!-- 2. NEW: MONTHLY FINANCIAL MASTER DASHBOARD -->
+            <div id="view-finances" class="hidden space-y-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-900">Financial Master Dashboard</h2>
+                        <p class="text-slate-500 text-xs">Aggregated earnings, paid fees, advances & receivables</p>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <button onclick="changeFinancesMonth(-1)" class="p-2 text-slate-600 border border-slate-200 hover:bg-slate-50 rounded-lg transition-colors"><i class="fa-solid fa-chevron-left text-xs"></i></button>
+                        <input type="month" id="financesMonthSelector" onchange="renderFinancesDashboard()" class="border border-slate-200 rounded-lg px-3 py-1.5 bg-white text-slate-800 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                        <button onclick="changeFinancesMonth(1)" class="p-2 text-slate-600 border border-slate-200 hover:bg-slate-50 rounded-lg transition-colors"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+                    </div>
+                </div>
+
+                <!-- Financial KPI Summary Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-4">
+                        <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Total Fees Charged</p>
+                        <p id="finTotalCharged" class="text-2xl font-bold text-slate-900">₹0</p>
+                    </div>
+                    <div class="bg-emerald-50/60 border border-emerald-200/60 rounded-xl p-4">
+                        <p class="text-[11px] font-semibold text-emerald-800 uppercase tracking-wider mb-1">Total Collected (Paid + Advances)</p>
+                        <p id="finTotalCollected" class="text-2xl font-bold text-emerald-700">₹0</p>
+                    </div>
+                    <div class="bg-amber-50/60 border border-amber-200/60 rounded-xl p-4">
+                        <p class="text-[11px] font-semibold text-amber-800 uppercase tracking-wider mb-1">Net Outstanding Balance</p>
+                        <p id="finNetBalance" class="text-2xl font-bold text-amber-700">₹0</p>
+                    </div>
+                </div>
+
+                <!-- Comprehensive Student Earnings Table -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+                    <div class="bg-slate-50 px-4 py-3 border-b border-slate-200 flex justify-between items-center">
+                        <h3 class="font-semibold text-xs text-slate-800 uppercase tracking-wider">Student-Wise Earnings & Payment Ledger</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-slate-50/50 text-slate-400 font-semibold uppercase border-b border-slate-200">
+                                    <th class="p-3">Student Name</th>
+                                    <th class="p-3">Classes</th>
+                                    <th class="p-3">Class Fees Due</th>
+                                    <th class="p-3">Amount Received</th>
+                                    <th class="p-3">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="financesTableBody" class="divide-y divide-slate-100 font-medium">
+                                <!-- Dynamic Financial Rows Injected -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. STUDENTS DIRECTORY -->
             <div id="view-students" class="hidden space-y-6">
                 <div class="flex justify-between items-center">
                     <div>
@@ -194,7 +240,7 @@
                 </div>
             </div>
 
-            <!-- TRACKER & BILLING VIEW -->
+            <!-- 4. STUDENT-WISE TRACKER & BILLING WORKSPACE -->
             <div id="view-tracker" class="hidden space-y-5">
                 <!-- Horizontal Quick Student Picker -->
                 <div class="border-b border-slate-200 pb-3">
@@ -204,7 +250,6 @@
                     </div>
                 </div>
 
-                <!-- Control Bar -->
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                     <div class="flex items-center gap-1">
                         <button onclick="changeMonth(-1)" class="p-1.5 text-slate-600 border border-slate-200 hover:bg-slate-50 rounded-lg transition-colors"><i class="fa-solid fa-chevron-left text-xs"></i></button>
@@ -221,11 +266,11 @@
 
                 <div id="trackerPlaceholder" class="flex flex-col items-center justify-center text-slate-400 text-center py-16 border-2 border-dashed border-slate-200 rounded-xl">
                     <i class="fa-solid fa-user-check text-2xl mb-2 text-rose-500"></i>
-                    <p class="text-sm font-medium">Select a student above to view attendance & bill payments.</p>
+                    <p class="text-sm font-medium">Select a student above to view attendance & manage finances.</p>
                 </div>
 
                 <div id="trackerContent" class="hidden flex-col space-y-5">
-                    <!-- Metrics Bar -->
+                    <!-- Student Financial Dashboard Metrics -->
                     <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
                         <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-3 text-center">
                             <span class="text-[11px] font-semibold text-slate-400 uppercase">Classes</span>
@@ -236,17 +281,17 @@
                             <p id="statFeePerClass" class="text-xl font-bold text-slate-900 mt-0.5">₹0</p>
                         </div>
                         <div class="bg-rose-50/50 border border-rose-200/60 rounded-xl p-3 text-center">
-                            <span class="text-[11px] font-semibold text-rose-800 uppercase">Total Fees</span>
+                            <span class="text-[11px] font-semibold text-rose-800 uppercase">Class Fees</span>
                             <p id="statTotalFees" class="text-xl font-bold text-rose-700 mt-0.5">₹0</p>
                         </div>
                         <div class="bg-emerald-50/50 border border-emerald-200/60 rounded-xl p-3 text-center flex flex-col justify-between">
                             <div>
-                                <span class="text-[11px] font-semibold text-emerald-800 uppercase">Received</span>
+                                <span class="text-[11px] font-semibold text-emerald-800 uppercase">Received / Balance</span>
                                 <p id="statPaymentStatus" class="text-sm font-bold text-emerald-700 mt-0.5">₹0 Paid</p>
                             </div>
                             <div class="flex gap-1.5 mt-2">
                                 <button onclick="openPaymentModal()" class="flex-1 text-[11px] bg-emerald-600 text-white font-semibold py-1 px-2 rounded-md hover:bg-emerald-700 transition-colors shadow-sm">
-                                    <i class="fa-solid fa-plus text-[10px] mr-1"></i> Log Paid
+                                    <i class="fa-solid fa-plus text-[10px] mr-1"></i> Record Pay
                                 </button>
                                 <button onclick="sendWhatsAppBillRequest()" class="text-[11px] bg-green-500 text-white font-semibold py-1 px-2 rounded-md hover:bg-green-600 transition-colors shadow-sm" title="Send WhatsApp Bill">
                                     <i class="fa-brands fa-whatsapp text-sm"></i>
@@ -271,11 +316,11 @@
                         </div>
                     </div>
 
-                    <!-- Payment History Log -->
+                    <!-- Inbuilt Payment History Ledger for Selected Student -->
                     <div class="bg-white border border-slate-200 rounded-xl shadow-sm p-4 space-y-3">
                         <div class="flex justify-between items-center">
                             <h3 class="font-semibold text-xs text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
-                                <i class="fa-solid fa-receipt text-slate-400"></i> Payment History
+                                <i class="fa-solid fa-receipt text-slate-400"></i> Student Payment History
                             </h3>
                             <button onclick="openPaymentModal()" class="text-xs text-rose-600 hover:underline font-semibold">
                                 + Add Log
@@ -383,7 +428,7 @@
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border border-slate-100">
             <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center">
                 <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
-                    <i class="fa-solid fa-indian-rupee-sign text-emerald-600"></i> Record Payment
+                    <i class="fa-solid fa-indian-rupee-sign text-emerald-600"></i> Record Payment / Advance
                 </h3>
                 <button onclick="closePaymentModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
@@ -400,7 +445,7 @@
 
                 <div>
                     <label class="block font-semibold text-slate-700 mb-1">Notes / Payment Mode</label>
-                    <input type="text" id="payNotes" placeholder="e.g., GPay for past 4 classes" class="w-full border border-slate-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-emerald-500 outline-none">
+                    <input type="text" id="payNotes" placeholder="e.g., GPay for past 4 classes / Advance" class="w-full border border-slate-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-emerald-500 outline-none">
                 </div>
             </div>
             <div class="bg-slate-50 px-6 py-3 flex justify-end gap-2 border-t border-slate-100">
@@ -479,6 +524,7 @@
                         const defaultMonth = `${today.getFullYear()}-${mm}`;
                         document.getElementById('monthSelector').value = defaultMonth;
                         document.getElementById('dashboardMonthSelector').value = defaultMonth;
+                        document.getElementById('financesMonthSelector').value = defaultMonth;
 
                         switchTab('dashboard');
                         setupRealtimeListeners();
@@ -523,6 +569,7 @@
                 updateStudentSelect();
                 window.renderStudents();
                 window.renderDashboard();
+                window.renderFinancesDashboard();
             });
 
             const trackingRef = collection(db, 'artifacts', appId, 'users', currentUserId, 'tracking');
@@ -533,15 +580,17 @@
                 });
                 window.renderTracker();
                 window.renderDashboard();
+                window.renderFinancesDashboard();
             });
         }
 
         window.switchTab = function(tab) {
             document.getElementById('view-dashboard').classList.add('hidden');
+            document.getElementById('view-finances').classList.add('hidden');
             document.getElementById('view-students').classList.add('hidden');
             document.getElementById('view-tracker').classList.add('hidden');
             
-            ['dashboard', 'students', 'tracker'].forEach(t => {
+            ['dashboard', 'finances', 'students', 'tracker'].forEach(t => {
                 const tabBtn = document.getElementById(`tab-${t}`);
                 tabBtn.className = 'flex-1 md:flex-none flex items-center p-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-all';
             });
@@ -551,10 +600,11 @@
             activeTab.className = 'flex-1 md:flex-none flex items-center p-2.5 rounded-xl text-xs font-semibold bg-rose-600 text-white shadow-sm transition-all';
             
             if (tab === 'dashboard') window.renderDashboard();
+            if (tab === 'finances') window.renderFinancesDashboard();
             if (tab === 'tracker') window.renderTracker();
         };
 
-        // --- Dashboard Logic ---
+        // --- 1. Class Overview Dashboard (Pure Classes Only) ---
         window.changeDashboardMonth = function(offset) {
             const selector = document.getElementById('dashboardMonthSelector');
             if (!selector.value) return;
@@ -572,9 +622,59 @@
 
             const monthObj = trackingData[monthVal] || {};
             let totalConducted = 0;
-            let totalRevenue = 0;
             
             const tableBody = document.getElementById('dashTableBody');
+            tableBody.innerHTML = '';
+
+            students.forEach(student => {
+                const records = monthObj[student.id] || {};
+                let attendanceCount = 0;
+                
+                Object.values(records).forEach(record => {
+                    if (record.status === 'Present') attendanceCount++;
+                });
+
+                const currentRate = parseFloat(student.feePerClass || 0);
+                totalConducted += attendanceCount;
+
+                tableBody.innerHTML += `
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="p-3 text-slate-900 font-semibold">${student.name}</td>
+                        <td class="p-3 text-slate-600 font-bold">${attendanceCount} classes</td>
+                        <td class="p-3 text-slate-500">₹${currentRate}</td>
+                    </tr>
+                `;
+            });
+
+            if (students.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="3" class="p-6 text-center text-slate-400 italic">No students created yet.</td></tr>`;
+            }
+
+            document.getElementById('dashTotalStudents').innerText = students.length;
+            document.getElementById('dashTotalClasses').innerText = totalConducted;
+        };
+
+        // --- 2. Master Financial Dashboard ---
+        window.changeFinancesMonth = function(offset) {
+            const selector = document.getElementById('financesMonthSelector');
+            if (!selector.value) return;
+            const [year, month] = selector.value.split('-').map(Number);
+            const newDate = new Date(year, month - 1 + offset, 1);
+            const newYear = newDate.getFullYear();
+            const newMonth = String(newDate.getMonth() + 1).padStart(2, '0');
+            selector.value = `${newYear}-${newMonth}`;
+            renderFinancesDashboard();
+        };
+
+        window.renderFinancesDashboard = function() {
+            const monthVal = document.getElementById('financesMonthSelector').value;
+            if (!monthVal) return;
+
+            const monthObj = trackingData[monthVal] || {};
+            let grandTotalCharged = 0;
+            let grandTotalCollected = 0;
+            
+            const tableBody = document.getElementById('financesTableBody');
             tableBody.innerHTML = '';
 
             students.forEach(student => {
@@ -594,39 +694,43 @@
                 });
 
                 const totalPaid = payments.reduce((sum, p) => sum + parseFloat(p.amount || 0), 0);
-                const currentRate = parseFloat(student.feePerClass || 0);
+                const netBalance = studentTotalDue - totalPaid;
 
-                totalConducted += attendanceCount;
-                totalRevenue += studentTotalDue;
+                grandTotalCharged += studentTotalDue;
+                grandTotalCollected += totalPaid;
 
                 let paymentBadge = `<span class="px-2 py-0.5 rounded text-[11px] bg-rose-100 text-rose-700 font-bold">Unpaid</span>`;
                 if (totalPaid >= studentTotalDue && studentTotalDue > 0) {
-                    paymentBadge = `<span class="px-2 py-0.5 rounded text-[11px] bg-emerald-100 text-emerald-700 font-bold">Paid (₹${totalPaid})</span>`;
+                    paymentBadge = `<span class="px-2 py-0.5 rounded text-[11px] bg-emerald-100 text-emerald-700 font-bold">Settled</span>`;
+                } else if (totalPaid > studentTotalDue) {
+                    paymentBadge = `<span class="px-2 py-0.5 rounded text-[11px] bg-blue-100 text-blue-700 font-bold">Advance Credit</span>`;
                 } else if (totalPaid > 0) {
-                    paymentBadge = `<span class="px-2 py-0.5 rounded text-[11px] bg-amber-100 text-amber-800 font-bold">Partial (₹${totalPaid}/₹${studentTotalDue})</span>`;
+                    paymentBadge = `<span class="px-2 py-0.5 rounded text-[11px] bg-amber-100 text-amber-800 font-bold">Partial Paid</span>`;
                 }
 
                 tableBody.innerHTML += `
                     <tr class="hover:bg-slate-50 transition-colors">
                         <td class="p-3 text-slate-900 font-semibold">${student.name}</td>
                         <td class="p-3 text-slate-500">${attendanceCount} classes</td>
-                        <td class="p-3 text-slate-500">₹${currentRate}</td>
-                        <td class="p-3 font-bold text-emerald-700">₹${studentTotalDue}</td>
+                        <td class="p-3 font-semibold text-slate-800">₹${studentTotalDue}</td>
+                        <td class="p-3 font-bold text-emerald-700">₹${totalPaid}</td>
                         <td class="p-3">${paymentBadge}</td>
                     </tr>
                 `;
             });
 
             if (students.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400 italic">No students created yet.</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400 italic">No financial data available.</td></tr>`;
             }
 
-            document.getElementById('dashTotalStudents').innerText = students.length;
-            document.getElementById('dashTotalClasses').innerText = totalConducted;
-            document.getElementById('dashTotalRevenue').innerText = `₹${totalRevenue}`;
+            const netGrandBalance = grandTotalCharged - grandTotalCollected;
+
+            document.getElementById('finTotalCharged').innerText = `₹${grandTotalCharged}`;
+            document.getElementById('finTotalCollected').innerText = `₹${grandTotalCollected}`;
+            document.getElementById('finNetBalance').innerText = `₹${netGrandBalance}`;
         };
 
-        // --- Students Logic ---
+        // --- 3. Students Logic ---
         function updateStudentSelect() {
             const select = document.getElementById('studentSelector');
             const currentVal = select.value;
@@ -779,7 +883,7 @@
             }
         };
 
-        // --- Tracker & Billing Logic ---
+        // --- 4. Student-Wise Tracker & Billing ---
         window.changeMonth = function(offset) {
             const selector = document.getElementById('monthSelector');
             if (!selector.value) return;
@@ -882,7 +986,7 @@
             tbody.innerHTML = '';
 
             if (payments.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-slate-400 italic">No payments logged for this month.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-slate-400 italic">No payments logged for this student.</td></tr>`;
                 return;
             }
 
@@ -921,7 +1025,6 @@
             }
         };
 
-        // --- WhatsApp Post-Class Payment Request Generator ---
         window.sendWhatsAppBillRequest = function() {
             const studentId = document.getElementById('studentSelector').value;
             const monthVal = document.getElementById('monthSelector').value;
@@ -1122,7 +1225,7 @@
 
         window.setupGoogleCalendar = function(startTime, endTime) {
             const title = encodeURIComponent("Carnatic Tracker Update");
-            const details = encodeURIComponent("Time to update student attendance.\n\nLink: " + window.location.href);
+            const details = encodeURIComponent("Time to update attendance.\n\nLink: " + window.location.href);
             const now = new Date();
             const year = now.getFullYear();
             const month = String(now.getMonth() + 1).padStart(2, '0');
@@ -1138,7 +1241,7 @@
             window.open(gCalUrl, '_blank');
         };
 
-        // --- Utils ---
+        // --- Toast Notifications ---
         window.showToast = function(message, type = 'info') {
             const toast = document.createElement('div');
             toast.className = `toast-animate px-3.5 py-2.5 rounded-xl shadow-lg text-white text-xs font-semibold flex items-center gap-2 ${type === 'error' ? 'bg-rose-600' : type === 'success' ? 'bg-slate-900' : 'bg-slate-800'}`;
@@ -1155,7 +1258,6 @@
             }, 2500);
         };
 
-        // Boot
         window.onload = initApp;
 
     </script>
